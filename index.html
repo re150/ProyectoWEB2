@@ -69,33 +69,30 @@
     </div> <!--formulario2-->
 
 
-    <div class="container-xl text-center mt-3 d-none" id="datos-usuario">
+    <div class="container text-center mt-3 d-none" id="datos-usuario">
 
-        <div class="bg-light bg-gradient p-1">
-
-            <h2 class="h4">Nombre:</h2>
+        <div class="bg-light bg-gradient p-1 d-flex justify-content-between align-items-stretch">
 
             <p id="field-nombre" class="h5"></p>
+            <button class="btn btn-info text-white" id="editarPlaceHolder1">Editar</button>
 
         </div>
-
-
     
-        <div class="bg-light bg-gradient p-1 mt-1">
-
-            <h2 class="h4">Edad:</h2>
+        <div class="bg-light bg-gradient p-1 mt-1 d-flex justify-content-between align-items-stretch">
 
             <p id="field-edad" class="h5"></p>
+            <button class="btn btn-info text-white" id="editarPlaceHolder2">Editar</button>
 
         </div>
 
-        <div class="bg-light bg-gradient p-1 mt-1">
-
-            <h2 class="h4">Teléfono:</h2>
-
+        <div class="bg-light bg-gradient p-1 mt-1 d-flex justify-content-between align-items-stretch">
+      
             <p id="field-tel" class="h5"></p>
+            <button class="btn btn-info text-white" id="editarPlaceHolder3">Editar</button>
 
         </div>
+
+        <button class="btn btn-danger text-white col-12" id="eliminarPlaceHolder1">Borrar</button>
 
     </div> <!--campo usuario-->
 
@@ -115,11 +112,7 @@
 
 
 
-    </div>
-
-    <!-- <div  class="container mb-3">
-        <button id = "delete"  class="btn btn-info mt-2 col-12 text-white">Delete</button>
-    </div> -->
+    </div> <!--Mostrar todo-->
 
 
     <script>
@@ -140,6 +133,51 @@
             const idUsuario = document.getElementById("usuario");
             const error = document.getElementById("mensaje-error");
             const mostrar = document.getElementById("mostrar_todos");
+            const editNamePlaceHolder = document.getElementById("editarPlaceHolder1");
+            const editAgePlaceHolder = document.getElementById("editarPlaceHolder2");
+            const editTelPlaceHolder = document.getElementById("editarPlaceHolder3");
+            const deletePlaceHolder = document.getElementById("eliminarPlaceHolder1");
+
+            const editTel = (index) => {
+
+                const oldValue = JSON.parse(localStorage.getItem(index));
+
+                let newValue = prompt("Ingresa el nuevo valor de telefono:", "");
+
+                if(newValue == null) return;
+
+                localStorage.setItem(index, JSON.stringify({ ...oldValue, telefono: newValue}));
+
+            }
+
+            const editAge = (index) => {
+
+                const oldValue = JSON.parse(localStorage.getItem(index));
+
+                let newValue = prompt("Ingresa el nuevo valor de edad:", "");
+
+                if(newValue == null) return;
+
+                localStorage.setItem(index, JSON.stringify({ ...oldValue, edad: newValue}));
+
+            }
+
+            const editName = (index) => {
+
+                const oldValue = JSON.parse(localStorage.getItem(index));
+
+                let newValue = prompt("Ingresa el nuevo valor nombre:", "");
+
+                if(newValue == null) return;
+
+                localStorage.setItem(index, JSON.stringify({ ...oldValue, name: newValue}));
+
+            }
+
+            let eventHandler1;
+            let eventHandler2;
+            let eventHandler3;
+            let listenersFlag = true;
 
             formulario.addEventListener("submit", (e) => {
 
@@ -191,6 +229,16 @@
                 //Se previene el refresco de la página
                 e.preventDefault();
 
+                if(!listenersFlag) {
+
+                    editNamePlaceHolder.removeEventListener("click", eventHandler2);
+                    editAgePlaceHolder.removeEventListener("click", eventHandler3);
+                    editTelPlaceHolder.removeEventListener("click", eventHandler1);
+
+                    listenersFlag = true;
+
+                }
+
                 const allData = {};
                 let index = -1;
 
@@ -218,6 +266,22 @@
                     document.getElementById("field-edad").innerHTML = JSON.parse(localStorage.getItem(index)).edad;
                     document.getElementById("field-tel").innerHTML = JSON.parse(localStorage.getItem(index)).telefono;
 
+                    eventHandler1 = () => editTel(index);
+                    eventHandler2 = () => editName(index);
+                    eventHandler3 = () => editAge(index);
+
+                    editNamePlaceHolder.addEventListener("click", eventHandler2);
+                    editAgePlaceHolder.addEventListener("click", eventHandler3);
+                    editTelPlaceHolder.addEventListener("click", eventHandler1);
+
+                    deletePlaceHolder.addEventListener("click", () => {
+
+                        localStorage.removeItem(index);
+
+                    });
+
+                    listenersFlag = false;
+
                 }
 
             });
@@ -226,6 +290,7 @@
             
                 const keys = [];
                 const fieldAllData = document.getElementById("fieldAllData");
+                let flag = true;
 
 
                 for(let i = 0; i < localStorage.length; i++) {
@@ -239,22 +304,114 @@
                     const p1 = document.createElement("p");
                     const p2 = document.createElement("p");
                     const p3 = document.createElement("p");
+
                     const containerDiv1 = document.createElement("div");
                     const containerDiv2 = document.createElement("div");
                     const containerDiv3 = document.createElement("div");
+                    
+                    let containerAll = document.getElementById("containerAll");
+
+                    if(!containerAll && flag) {
+
+                        console.log("hola");
+                        containerAll = document.createElement("div");
+                        containerAll.id = "containerAll";
+                        flag = false;
+
+                    } else if(flag) {    
+
+                        fieldAllData.removeChild(document.getElementById("containerAll"));
+
+                        containerAll = document.createElement("div");
+                        containerAll.id = "containerAll";
+                        flag = false;
+
+                    }
+
+                    console.log(containerAll);  
 
                     const btnEliminar = document.createElement("button");
-                    const btnEdit = document.createElement("button");
 
-                    p1.classList.add("h5");
-                    p2.classList.add("h5");
-                    p3.classList.add("h5");
+                    const btnEditName = document.createElement("button");
+                    const btnEditAge = document.createElement("button");
+                    const btnEditTel = document.createElement("button");
 
-                    containerDiv1.classList.add("d-flex", "align-items-center", "justify-content-center");
-                    containerDiv2.classList.add("d-flex", "align-items-center", "justify-content-center");
-                    containerDiv3.classList.add("d-flex", "align-items-center", "justify-content-center");
+                    const breakLine = document.createElement("hr");
 
-                    btnEdit.classList.add("btn", "btn-info", "text-white");
+                    btnEditName.innerHTML = "Editar";
+                    btnEditAge.innerHTML = "Editar";
+                    btnEditTel.innerHTML = "Editar";
+                    btnEliminar.innerHTML = "Eliminar";
+
+                    p1.classList.add("h5", "m-0");
+                    p2.classList.add("h5", "m-0");
+                    p3.classList.add("h5", "m-0");
+
+                    containerDiv1.classList.add("d-flex", "align-items-stretch", "justify-content-between", "mb-3");
+                    containerDiv2.classList.add("d-flex", "align-items-stretch", "justify-content-between", "mb-3");
+                    containerDiv3.classList.add("d-flex", "align-items-stretch", "justify-content-between", "mb-3");
+
+                    btnEditName.classList.add("btn", "btn-info", "text-white");
+                    btnEditAge.classList.add("btn", "btn-info", "text-white");
+                    btnEditTel.classList.add("btn", "btn-info", "text-white");
+
+                    btnEliminar.classList.add("btn", "btn-danger", "text-white", "col-12");
+
+                    btnEditName.id = `${key}_name`;
+                    btnEditAge.id = `${key}_edad`;
+                    btnEditTel.id = `${key}_telefono`;
+                    btnEliminar.id = `borrar_${key}`
+
+                    btnEliminar.addEventListener("click", (e) => {
+
+                        const id = e.target.id;
+                        const idArr = id.split("_");
+                        localStorage.removeItem(idArr[1]);
+
+                    });
+
+                    btnEditName.addEventListener("click", (e) => {
+
+                        const id = e.target.id;
+                        const idArr = id.split("_");
+                        const key = idArr[1];
+
+                        let newValue = prompt("Ingresa el nuevo valor", "");
+
+                        if(newValue == null) return;
+
+                        const oldValue = JSON.parse(localStorage.getItem(idArr[0]));
+                        localStorage.setItem(id[0], JSON.stringify({ ...oldValue, [key]: newValue}))
+
+                    });
+                    btnEditAge.addEventListener("click", (e) => {
+
+                        const id = e.target.id;
+                        const idArr = id.split("_");
+                        const key = idArr[1];
+
+                        let newValue = prompt("Ingresa el nuevo valor", "");
+
+                        if(newValue == null) return;
+
+                        const oldValue = JSON.parse(localStorage.getItem(idArr[0]));
+                        localStorage.setItem(id[0], JSON.stringify({ ...oldValue, [key]: newValue}))
+
+                    });
+                    btnEditTel.addEventListener("click", (e) => {
+
+                        const id = e.target.id;
+                        const idArr = id.split("_");
+                        const key = idArr[1];
+
+                        let newValue = prompt("Ingresa el nuevo valor", "");
+
+                        if(newValue == null) return;
+
+                        const oldValue = JSON.parse(localStorage.getItem(idArr[0]));
+                        localStorage.setItem(id[0], JSON.stringify({ ...oldValue, [key]: newValue}))
+
+                    });
 
                     //console.log(JSON.parse(localStorage.getItem(key)).name);
 
@@ -262,24 +419,28 @@
                     p2.innerHTML = JSON.parse(localStorage.getItem(key)).edad;
                     p3.innerHTML = JSON.parse(localStorage.getItem(key)).telefono;
 
-                    p3.classList.add("mb-5", "text-center");
+                    p3.classList.add("text-center");
                     p2.classList.add("text-center");
                     p1.classList.add("text-center");
 
                     containerDiv1.appendChild(p1);
-                    containerDiv1.appendChild(btnEdit);
+                    containerDiv1.appendChild(btnEditName);
                     
                     containerDiv2.appendChild(p2);
-                    containerDiv2.appendChild(btnEdit);
+                    containerDiv2.appendChild(btnEditAge);
 
                     containerDiv3.appendChild(p3);
-                    containerDiv3.appendChild(btnEdit);
+                    containerDiv3.appendChild(btnEditTel);
 
-                    fieldAllData.appendChild(containerDiv1);
-                    fieldAllData.appendChild(containerDiv2);
-                    fieldAllData.appendChild(containerDiv3);
+                    containerAll.appendChild(containerDiv1);
+                    containerAll.appendChild(containerDiv2);
+                    containerAll.appendChild(containerDiv3);
+                    containerAll.appendChild(btnEliminar);
+                    containerAll.appendChild(breakLine);
 
-                    //fieldAllData.appendChild()
+                    fieldAllData.appendChild(containerAll);
+
+                    //fieldAllData.appendChild( )
                     
                 }
 
