@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+</head>
+<body>
+    
+    <h1 class="h1 text-center bg-success bg-gradient p-3 text-white">Local storage</h1>
+
+    <div class="container-xl">
+
+        <form id="formulario" class="border border-black p-3 bg-dark bg-gradient text-white">
+
+            <legend class="h4 mb-4 text-center">Guardar</legend>
+
+            <div class="form-group">
+
+                <label>Nombre</label>
+                <input type="text" id="Nombre" class="form-control">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Edad</label>
+                <input type="number" id="edad" class="form-control"">
+
+            </div>
+    
+            <div class="form-group">
+
+                <label>Número de telefono</label>
+                <input type="tel" id="telefono" class="form-control"">
+
+            </div>
+
+            <input type="submit" id="submit" class="btn btn-info mt-2 col-12 text-white">
+    
+        </form>
+
+
+    </div> <!--formulario-->
+
+    <div class="container-xl text-white">
+        
+        <form id="formulario2" class="border border-black p-3 mt-3 bg-dark bg-gradient">
+
+            <legend class="h4 mb-4 text-center">Buscar</legend>
+
+            <div>
+
+                <label>Ingresa el teléfono del usuario que desea buscar: </label>
+                <input type="number" class="form-control" id="usuario">
+
+            </div>
+
+            <input type="submit" id="submit" class="btn btn-info mt-2 col-12 text-white" value="Buscar">
+
+        </form>
+
+    </div> <!--formulario2-->
+
+
+    <div class="container-xl text-center mt-3 d-none" id="datos-usuario">
+
+        <div class="bg-light bg-gradient p-1">
+
+            <h2 class="h4">Nombre:</h2>
+
+            <p id="field-nombre" class="h5"></p>
+
+        </div>
+
+
+    
+        <div class="bg-light bg-gradient p-1 mt-1">
+
+            <h2 class="h4">Edad:</h2>
+
+            <p id="field-edad" class="h5"></p>
+
+        </div>
+
+        <div class="bg-light bg-gradient p-1 mt-1">
+
+            <h2 class="h4">Teléfono:</h2>
+
+            <p id="field-tel" class="h5"></p>
+
+        </div>
+
+    </div> <!--campo usuario-->
+
+    <div class="bg-danger text-center p-2 text-white container mt-3 rounded d-none" id="mensaje-error">
+
+        <p class="m-0">No se encontró el usuario</p>
+
+    </div>
+
+    <div class="container mb-3">
+
+        <button id = "mostrar_todos" class="btn btn-info mt-2 col-12 text-white">MOSTRAR TODOS</button>
+
+    </div>
+
+    <div class="container" id="fieldAllData">
+
+
+
+    </div>
+
+    <!-- <div  class="container mb-3">
+        <button id = "delete"  class="btn btn-info mt-2 col-12 text-white">Delete</button>
+    </div> -->
+
+
+    <script>
+
+        let id = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+
+            saveLocalStorage();
+
+        });
+
+        const saveLocalStorage = () => {
+
+            const formulario = document.getElementById("formulario");
+            const formulario2 = document.getElementById("formulario2");
+            const usuarioField = document.getElementById("datos-usuario");
+            const idUsuario = document.getElementById("usuario");
+            const error = document.getElementById("mensaje-error");
+            const mostrar = document.getElementById("mostrar_todos");
+
+            formulario.addEventListener("submit", (e) => {
+
+                e.preventDefault(); 
+
+                const name = document.getElementById("Nombre");
+                const edad = document.getElementById("edad");
+                const telefono = document.getElementById("telefono");
+                const pos = document.getElementById("pos");
+                
+                if(!name.value || !edad.value.toString() || !telefono.value.toString()) {
+                    alert("Campo vacio")
+                    return;
+                }
+
+                for(let i = 0; i < localStorage.length; i++) {
+
+                    let key = localStorage.key(i);
+
+                    console.log(JSON.parse(localStorage.getItem(key)).telefono + "  " + telefono.value.toString());
+                    
+                    if(JSON.parse(localStorage.getItem(key)).telefono == telefono.value.toString()) {
+
+                        alert("Registro duplicado");
+                        return;
+
+                    } 
+
+                }
+
+                const usuario = {
+
+                    name: name.value,
+                    edad: edad.value.toString(),
+                    telefono: telefono.value.toString(),
+
+                }
+
+                console.log(id);
+                id += 1;
+                
+
+                localStorage.setItem(id, JSON.stringify(usuario));
+
+            });
+
+            formulario2.addEventListener("submit", (e) => {
+
+                //Se previene el refresco de la página
+                e.preventDefault();
+
+                const allData = {};
+                let index = -1;
+
+                //Se busca la llave del item en localStorage según el teléfono que ingresó el usuario
+                for(let i = 0; i < localStorage.length; i++) {
+
+                    let key = localStorage.key(i);
+  
+                    if(JSON.parse(localStorage.getItem(key)).telefono == idUsuario.value) index = key;
+                    
+                }
+
+                if(index == -1) {
+
+                    usuarioField.classList.add("d-none");
+                    error.classList.remove("d-none");
+                    return;
+
+                } else {
+
+                    usuarioField.classList.remove("d-none");
+                    error.classList.add("d-none");
+ 
+                    document.getElementById("field-nombre").innerHTML = JSON.parse(localStorage.getItem(index)).name;
+                    document.getElementById("field-edad").innerHTML = JSON.parse(localStorage.getItem(index)).edad;
+                    document.getElementById("field-tel").innerHTML = JSON.parse(localStorage.getItem(index)).telefono;
+
+                }
+
+            });
+
+        mostrar.addEventListener("click", (e) => {
+            
+                const keys = [];
+                const fieldAllData = document.getElementById("fieldAllData");
+
+
+                for(let i = 0; i < localStorage.length; i++) {
+
+                    keys[i] = localStorage.key(i);
+
+                }
+
+                for(let key of keys) {
+
+                    const p1 = document.createElement("p");
+                    const p2 = document.createElement("p");
+                    const p3 = document.createElement("p");
+                    const containerDiv1 = document.createElement("div");
+                    const containerDiv2 = document.createElement("div");
+                    const containerDiv3 = document.createElement("div");
+
+                    const btnEliminar = document.createElement("button");
+                    const btnEdit = document.createElement("button");
+
+                    p1.classList.add("h5");
+                    p2.classList.add("h5");
+                    p3.classList.add("h5");
+
+                    containerDiv1.classList.add("d-flex", "align-items-center", "justify-content-center");
+                    containerDiv2.classList.add("d-flex", "align-items-center", "justify-content-center");
+                    containerDiv3.classList.add("d-flex", "align-items-center", "justify-content-center");
+
+                    btnEdit.classList.add("btn", "btn-info", "text-white");
+
+                    //console.log(JSON.parse(localStorage.getItem(key)).name);
+
+                    p1.innerHTML = JSON.parse(localStorage.getItem(key)).name;
+                    p2.innerHTML = JSON.parse(localStorage.getItem(key)).edad;
+                    p3.innerHTML = JSON.parse(localStorage.getItem(key)).telefono;
+
+                    p3.classList.add("mb-5", "text-center");
+                    p2.classList.add("text-center");
+                    p1.classList.add("text-center");
+
+                    containerDiv1.appendChild(p1);
+                    containerDiv1.appendChild(btnEdit);
+                    
+                    containerDiv2.appendChild(p2);
+                    containerDiv2.appendChild(btnEdit);
+
+                    containerDiv3.appendChild(p3);
+                    containerDiv3.appendChild(btnEdit);
+
+                    fieldAllData.appendChild(containerDiv1);
+                    fieldAllData.appendChild(containerDiv2);
+                    fieldAllData.appendChild(containerDiv3);
+
+                    //fieldAllData.appendChild()
+                    
+                }
+
+
+            } );
+
+        }
+
+    </script>
+
+</body>
+</html>
